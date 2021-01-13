@@ -1,5 +1,6 @@
 import './App.css';
 import Login from './components/login/login.js'
+import Sales from './components/sales/sales.js'
 import {
   BrowserRouter as Router,
   Switch,
@@ -12,15 +13,16 @@ function App() {
     <Router>
       <div>
         <Switch>
-          <Route path="/">
+          <Route path="/login">
             <Login />
+          </Route>
+          <Route path="/sales">
+            <Sales />
           </Route>
         </Switch>
       </div>
     </Router>
   );
 }
-function About() {
-  return <h2>About</h2>;
-}
+
 export default App;
