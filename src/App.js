@@ -2,6 +2,7 @@ import './App.css';
 import NavBar from './components/navBar/navBar.js'
 import Login from './components/login/login.js'
 import Sales from './components/sales/sales.js'
+import Orders from './components/orders/orders.js'
 import {
   BrowserRouter as Router,
   Switch,
@@ -20,6 +21,9 @@ function App() {
           </Route>
           <Route path="/sales">
             <Sales />
+          </Route>
+          <Route path="/orders">
+            <Orders />
           </Route>
         </Switch>
       </div>
