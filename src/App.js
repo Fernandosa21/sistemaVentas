@@ -1,4 +1,5 @@
 import './App.css';
+import NavBar from './components/navBar/navBar.js'
 import Login from './components/login/login.js'
 import Sales from './components/sales/sales.js'
 import {
@@ -11,6 +12,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 function App() {
   return (
     <Router>
+      <NavBar/>
       <div>
         <Switch>
           <Route path="/login">
