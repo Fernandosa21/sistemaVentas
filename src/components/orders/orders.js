@@ -1,181 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
+import { getSales } from '../../services/SaleService'
+import { getSaleDetails } from '../../services/SaleDetailsService'
 
 const Orders = () => {
-  const orders = [
-    {
-      orderNo: 0,
-      products: [
-        {
-          name: "Hamburguesa",
-          price: 100.00,
-          quantity: 1,
-        },
-        {
-          name: "Soda",
-          price: 35.00,
-          quantity: 1,
-        }
-      ],
-    },
-    {
-      orderNo: 1,
-      products: [
-        {
-          name: "Hamburguesa",
-          price: 100.00,
-          quantity: 2,
-        },
-        {
-          name: "Soda",
-          price: 35.00,
-          quantity: 2,
-        }
-      ],
-    },
-    {
-      orderNo: 2,
-      products: [
-        {
-          name: "Hamburguesa",
-          price: 100.00,
-          quantity: 1,
-        },
-        {
-          name: "Soda",
-          price: 35.00,
-          quantity: 1,
-        }
-      ],
-    },
-    {
-      orderNo: 3,
-      products: [
-        {
-          name: "Hamburguesa",
-          price: 100.00,
-          quantity: 1,
-        },
-        {
-          name: "Soda",
-          price: 35.00,
-          quantity: 1,
-        }
-      ],
-    },
-    {
-      orderNo: 4,
-      products: [
-        {
-          name: "Hamburguesa",
-          price: 100.00,
-          quantity: 1,
-        },
-        {
-          name: "Soda",
-          price: 35.00,
-          quantity: 1,
-        }
-      ],
-    },
-    {
-      orderNo: 5,
-      products: [
-        {
-          name: "Hamburguesa",
-          price: 100.00,
-          quantity: 1,
-        },
-        {
-          name: "Soda",
-          price: 35.00,
-          quantity: 1,
-        }
-      ],
-    },
-    {
-      orderNo: 6,
-      products: [
-        {
-          name: "Hamburguesa",
-          price: 100.00,
-          quantity: 1,
-        },
-        {
-          name: "Soda",
-          price: 35.00,
-          quantity: 1,
-        }
-      ],
-    },
-    {
-      orderNo: 7,
-      products: [
-        {
-          name: "Hamburguesa",
-          price: 100.00,
-          quantity: 1,
-        },
-        {
-          name: "Soda",
-          price: 35.00,
-          quantity: 1,
-        }
-      ],
-    },
-    {
-      orderNo: 8,
-      products: [
-        {
-          name: "Hamburguesa",
-          price: 100.00,
-          quantity: 1,
-        },
-        {
-          name: "Soda",
-          price: 35.00,
-          quantity: 1,
-        }
-      ],
-    },
-    {
-      orderNo: 9,
-      products: [
-        {
-          name: "Hamburguesa",
-          price: 100.00,
-          quantity: 1,
-        },
-        {
-          name: "Soda",
-          price: 35.00,
-          quantity: 1,
-        }
-      ],
-    },
-    {
-      orderNo: 10,
-      products: [
-        {
-          name: "Hamburguesa",
-          price: 100.00,
-          quantity: 1,
-        },
-        {
-          name: "Soda",
-          price: 35.00,
-          quantity: 1,
-        }
-      ],
-    },
-  ]
+  useEffect(() => {
+    callApi();
+  },
+  []);
+
+  const callApi = async() =>{
+    const sales = await getSales(true);
+    setOrders(sales.sales)
+  }
 
   const [details, setDetails] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState();
+  const [orders, setOrders] = useState([]);
 
-  const selectOrder = (order) => {
+  const selectOrder = async (order) => {
+    const saleDetails = await getSaleDetails(order.id_sale);
+    const currentOrder = {
+      ...order,
+      products: saleDetails.saleDetails
+    }
+    setSelectedOrder(currentOrder)
     setDetails(true);
-    setSelectedOrder(order)
   }
 
   const calculateTotal = () => {
@@ -198,7 +48,7 @@ const Orders = () => {
             <tbody>
               {orders.map((order, index) => (
                 <tr key={index}>
-                  <th className="text-center" scope="row">{order.orderNo}</th>
+                  <th className="text-center" scope="row">{order.id_order}</th>
                   <td className="text-right">
                     <button type="button" class="btn btn-link" onClick={() => selectOrder(order)}>
                       <FiChevronRight />
@@ -219,8 +69,8 @@ const Orders = () => {
             </button>
           </div>
           <div className="col-8 row">
-            <text>Order Numero:</text>
-            <text>{selectedOrder.orderNo}</text>
+            <text>Orden Numero:</text>
+            <text>{selectedOrder.id_order}</text>
           </div>
           <table className="table">
             <thead>
