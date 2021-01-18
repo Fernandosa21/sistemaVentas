@@ -1,88 +1,253 @@
-import { FiChevronRight } from "react-icons/fi";
+import React, { useState } from "react";
+import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
+
 const Orders = () => {
   const orders = [
     {
       orderNo: 0,
-      clientName: 'Tarjeta',
-      total: 135.00
+      products: [
+        {
+          name: "Hamburguesa",
+          price: 100.00,
+          quantity: 1,
+        },
+        {
+          name: "Soda",
+          price: 35.00,
+          quantity: 1,
+        }
+      ],
     },
     {
       orderNo: 1,
-      clientName: 'Efectivo',
-      total: 145.00
+      products: [
+        {
+          name: "Hamburguesa",
+          price: 100.00,
+          quantity: 2,
+        },
+        {
+          name: "Soda",
+          price: 35.00,
+          quantity: 2,
+        }
+      ],
     },
     {
       orderNo: 2,
-      clientName: 'Contraventa',
-      total: 155.00
+      products: [
+        {
+          name: "Hamburguesa",
+          price: 100.00,
+          quantity: 1,
+        },
+        {
+          name: "Soda",
+          price: 35.00,
+          quantity: 1,
+        }
+      ],
     },
     {
       orderNo: 3,
-      clientName: 'Tarjeta',
-      total: 165.00
+      products: [
+        {
+          name: "Hamburguesa",
+          price: 100.00,
+          quantity: 1,
+        },
+        {
+          name: "Soda",
+          price: 35.00,
+          quantity: 1,
+        }
+      ],
     },
     {
       orderNo: 4,
-      clientName: 'Contraventa',
-      total: 300.00
+      products: [
+        {
+          name: "Hamburguesa",
+          price: 100.00,
+          quantity: 1,
+        },
+        {
+          name: "Soda",
+          price: 35.00,
+          quantity: 1,
+        }
+      ],
     },
     {
       orderNo: 5,
-      clientName: 'Contraventa',
-      total: 135.15
+      products: [
+        {
+          name: "Hamburguesa",
+          price: 100.00,
+          quantity: 1,
+        },
+        {
+          name: "Soda",
+          price: 35.00,
+          quantity: 1,
+        }
+      ],
     },
     {
       orderNo: 6,
-      clientName: 'Tarjeta',
-      total: 135.10
+      products: [
+        {
+          name: "Hamburguesa",
+          price: 100.00,
+          quantity: 1,
+        },
+        {
+          name: "Soda",
+          price: 35.00,
+          quantity: 1,
+        }
+      ],
     },
     {
       orderNo: 7,
-      clientName: 'Efectivo',
-      total: 100.00
+      products: [
+        {
+          name: "Hamburguesa",
+          price: 100.00,
+          quantity: 1,
+        },
+        {
+          name: "Soda",
+          price: 35.00,
+          quantity: 1,
+        }
+      ],
     },
     {
       orderNo: 8,
-      clientName: 'Efectivo',
-      total: 50.00
+      products: [
+        {
+          name: "Hamburguesa",
+          price: 100.00,
+          quantity: 1,
+        },
+        {
+          name: "Soda",
+          price: 35.00,
+          quantity: 1,
+        }
+      ],
     },
     {
       orderNo: 9,
-      clientName: 'Tarjeta',
-      total: 1520.00
+      products: [
+        {
+          name: "Hamburguesa",
+          price: 100.00,
+          quantity: 1,
+        },
+        {
+          name: "Soda",
+          price: 35.00,
+          quantity: 1,
+        }
+      ],
     },
     {
       orderNo: 10,
-      clientName: 'Tarjeta',
-      total: 400.00
+      products: [
+        {
+          name: "Hamburguesa",
+          price: 100.00,
+          quantity: 1,
+        },
+        {
+          name: "Soda",
+          price: 35.00,
+          quantity: 1,
+        }
+      ],
     },
   ]
 
+  const [details, setDetails] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState();
+
+  const selectOrder = (order) => {
+    setDetails(true);
+    setSelectedOrder(order)
+  }
+
+  const calculateTotal = () => {
+    const total = selectedOrder.products.reduce((acc,item) => acc+(item.price*item.quantity) , 0)
+    return total
+  }
+
   return (
     <div className="col-12 p-0 d-flex justify-content-center">
-      <div className="col-8 ">
-        <h1>Ordenes</h1>
-        <table className="table">
-          <thead>
-            <tr>
-              <th className="text-center" scope="col">#</th>
-              <th className="text-center" scope="col">Método de Pago</th>
-              <th className="text-center" scope="col">Total</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order, index) => (
-              <tr key={index}>
-                <th className="text-center" scope="row">{order.orderNo}</th>
-                <td className="text-center">{order.clientName}</td>
-                <td className="text-center">{order.total.toFixed(2)}</td>
-                <td className="text-right"><FiChevronRight /></td>
+      { !details ?
+        <div className="col-8 ">
+          <h1>Ordenes</h1>
+          <table className="table">
+            <thead>
+              <tr>
+                <th className="text-center" scope="col">#</th>
+                <th></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {orders.map((order, index) => (
+                <tr key={index}>
+                  <th className="text-center" scope="row">{order.orderNo}</th>
+                  <td className="text-right">
+                    <button type="button" class="btn btn-link" onClick={() => selectOrder(order)}>
+                      <FiChevronRight />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        :
+        <div className="col-8 ">
+          <h1>Detallas de Ordenes</h1>
+          <div className="col-8">
+            <button type="button" class="btn btn-link" onClick={() => setDetails(false)}>
+              <FiChevronLeft />
+              <text>Atras</text>
+            </button>
+          </div>
+          <div className="col-8 row">
+            <text>Order Numero:</text>
+            <text>{selectedOrder.orderNo}</text>
+          </div>
+          <table className="table">
+            <thead>
+              <tr>
+                <th className="text-center" scope="col">Cantidad</th>
+                <th className="text-center" scope="col">Producto</th>
+                <th className="text-center" scope="col">Precio</th>
+              </tr>
+            </thead>
+            <tbody>
+              {selectedOrder.products.map((product, index) => (
+                <tr key={index}>
+                  <td className="text-center" scope="row">{product.quantity}</td>
+                  <td className="text-center" scope="row">{product.name}</td>
+                  <td className="text-center" scope="row">{product.price}</td>
+                </tr>
+              ))}
+              <td className="text-center" scope="row"></td>
+              <th className="text-center" scope="row">Total</th>
+              <td className="text-center" scope="row">{calculateTotal()}</td>
+            </tbody>
+          </table>
+          <div className="text-right">
+            <button type="button" class="btn btn-info">Cobrar</button>
+          </div>
+        </div>
+      }
     </div>
   );
 }
