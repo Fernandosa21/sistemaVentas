@@ -3,6 +3,7 @@ import NavBar from './components/navBar/navBar.js'
 import Login from './components/login/login.js'
 import Sales from './components/sales/sales.js'
 import Orders from './components/orders/orders.js'
+import CutOff from './components/sales/cutOff.js'
 import {
   BrowserRouter as Router,
   Switch,
@@ -24,6 +25,9 @@ function App() {
           </Route>
           <Route path="/orders">
             <Orders />
+          </Route>
+          <Route path="/cutOff">
+            <CutOff />
           </Route>
         </Switch>
       </div>

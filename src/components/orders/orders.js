@@ -219,8 +219,8 @@ const Orders = () => {
             </button>
           </div>
           <div className="col-8 row">
-            <text>Order Numero:</text>
-            <text>{selectedOrder.orderNo}</text>
+            <text>Order Numero: </text>
+            <text> {selectedOrder.orderNo}</text>
           </div>
           <table className="table">
             <thead>
