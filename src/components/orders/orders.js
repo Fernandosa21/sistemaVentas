@@ -70,7 +70,7 @@ const Orders = () => {
           </div>
           <div className="col-8 row">
             <text>Orden Numero:</text>
-            <text>{selectedOrder.id_order}</text>
+            <text> {selectedOrder.id_order}</text>
           </div>
           <table className="table">
             <thead>
