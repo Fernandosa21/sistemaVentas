@@ -1,4 +1,13 @@
+import React, { useState, useEffect } from 'react';
+import moment from 'moment';
+import 'moment/locale/es-mx'
+
 const CutOff = () => {
+  useEffect(() => {
+    obtainTurn();
+  },
+  []);
+
   const sales = [
     {
       orderNo: 1,
@@ -55,6 +64,24 @@ const CutOff = () => {
   const cash = sales.filter(sale => sale.paymentMethod === 'Efectivo')
   const totalCash = cash.reduce((acc, { total }) => acc + total, 0)
   const totalDay = sales.reduce((acc, { total }) => acc + total, 0)
+  moment.locale('es');
+  const today = moment().format('DD/MMMM/YYYY');
+  const [openingTime, setOpeningTime] = useState(""); 
+  const [closingTime, setClosingTime] = useState("")
+  
+  //Obtener el dia y hora para poner las horas de apertuara y cierre de cada turno
+
+  const obtainTurn = () => {
+    const hour = moment().hour();
+    if (hour > 8 && hour < 13) {
+      setOpeningTime("09:00 a.m.");
+      setClosingTime("02:00 p.m.");
+    } 
+    else {
+      setOpeningTime("03:00 a.m.");
+      setClosingTime("08:00 p.m.");
+    }
+  }
 
   return (
     <div className="col-12 p-0 d-flex justify-content-center">
@@ -64,15 +91,15 @@ const CutOff = () => {
           <div class="col">
             <div class="d-flex justify-content-between pr-2 ml-3">
               <text className="font-weight-bold">Fecha</text>
-              <text> 17/01/2021</text>
+              <text> {today}</text>
             </div>
             <div class="d-flex justify-content-between pr-2 ml-3">
               <text className="font-weight-bold">Hora de Apertura</text>
-              <text> 9:00 a.m.</text>
+              <text> {openingTime}</text>
             </div>
             <div class="d-flex justify-content-between pr-2 ml-3">
               <text className="font-weight-bold">Hora de Cierre</text>
-              <text> 8:00 p.m.</text>
+              <text> {closingTime}</text>
             </div>
             <div class="d-flex justify-content-between pr-2 ml-3">
               <text className="font-weight-bold">Cajero / Operador</text>
@@ -97,10 +124,6 @@ const CutOff = () => {
             <div class="d-flex justify-content-between pr-2 ml-3">
               <text className="font-weight-bold">Cobros Realizados</text>
               <text> {sales.length}</text>
-            </div>
-            <div class="d-flex justify-content-between pr-2 ml-3">
-              <text className="font-weight-bold">Cobros Cancelados</text>
-              <text> 0</text>
             </div>
           </div>
         </div>
