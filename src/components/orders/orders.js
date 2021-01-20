@@ -168,18 +168,18 @@ const Orders = () => {
             <h5>Pago con Tarjeta</h5>
             <text>Ingresa los datos correspondientes</text>
             <div className="row d-flex justify-content-between mt-4 mb-4">
-              <div class="d-flex justify-content-between ml-3">
+              <div class="d-flex justify-content-between m-3 col">
                 <text className="font-weight-bold mr-3">Numero de tarjeta</text>
                 <input type="text" name="card" value={card} onChange={handleChange} class="form-control" />
               </div>
-              <div class="d-flex justify-content-between m-3">
+              <div class="d-flex justify-content-between m-3 col">
                 <text className="font-weight-bold mr-3">Nip</text>
                 <input type="password" name="nip" value={nip} onChange={handleChange} class="form-control" />
               </div>
             </div>
           </div>
         }
-        <div className="text-right">
+        <div className="text-right m-3">
           <button type="button" class="btn btn-info btn-lg">Pagar</button>
         </div>
       </div>
