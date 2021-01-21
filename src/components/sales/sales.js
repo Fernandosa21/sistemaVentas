@@ -1,6 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { getSales } from '../../services/SaleService'
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 
 const Sales = () => {
   useEffect(() => {
@@ -8,8 +10,23 @@ const Sales = () => {
   },
     []);
 
-  const [sales, setSales] = useState([]) 
-  const totalDay = sales.filter(({pay_method}) => pay_method === 'Efectivo' ).reduce((acc, { amount }) => acc + amount, 0)
+  const Alert = (props) => {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+  }
+
+
+  const handleAlert = (type, message) => {
+    setOpen(true);
+    setMessage(message)
+    setType(type)
+  }
+
+
+  const [sales, setSales] = useState([])
+  const totalDay = sales.filter(({ pay_method }) => pay_method === 'Efectivo').reduce((acc, { amount }) => acc + amount, 0)
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [type, setType] = useState("");
 
   const callApi = async () => {
     try {
@@ -17,12 +34,24 @@ const Sales = () => {
       setSales(responseSales)
     }
     catch (err) {
-
+      handleAlert("error", "Hubo un error al cargar las ventas");
     }
   }
 
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpen(false);
+  };
+
   return (
     <div className="col-12 p-0 d-flex justify-content-center">
+      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity={type}>
+          {message}
+        </Alert>
+      </Snackbar>
       <div className="col-8 ">
         <h1>Ventas de hoy</h1>
         <table className="table">
