@@ -3,19 +3,36 @@ import moment from 'moment';
 import 'moment/locale/es-mx'
 import { getCutoffs, putCutoff } from '../../services/CutoffService'
 import { getSales } from '../../services/SaleService'
+import styles from '../styles.module.css';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 
 const CutOff = () => {
   useEffect(() => {
     callApi();
   }, []);
 
+  const Alert = (props) => {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+  }
+  const handleAlert = (type, message) => {
+    setShowAlert(true);
+    setMessage(message)
+    setType(type)
+  }
+
   moment.locale('es');
   const [openCutoff, setOpenCutoff] = useState({})
   const [closedCutoff, setClosedCutoff] = useState([])
-  const [sales, setSales] = useState([]) 
+  const [sales, setSales] = useState([])
   const cash = sales.filter(sale => sale.pay_method === 'Efectivo')
   const totalCash = cash.reduce((acc, { amount }) => acc + amount, 0)
   const totalDay = sales.reduce((acc, { amount }) => acc + amount, 0)
+  const [casher, setCasher] = useState("");
+  const [initialAmount, setInitialAmount] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
+  const [message, setMessage] = useState("");
+  const [type, setType] = useState("");
 
   const callApi = async () => {
     try {
@@ -23,7 +40,7 @@ const CutOff = () => {
       const open = response.filter(item => item.status === 'opened')[0];
       const closed = response.filter(item => item.status === 'closed');
       const responseSales = (await getSales()).sales;
-      
+
       console.log(responseSales)
       setOpenCutoff(open)
       setClosedCutoff(closed)
@@ -31,6 +48,37 @@ const CutOff = () => {
     }
     catch (err) {
 
+    }
+  }
+
+  const handleChange = (event) => {
+    switch (event.target.name) {
+      case 'casher':
+        setCasher(event.target.value);
+        break;
+      case 'initialAmount':
+        setInitialAmount(event.target.value);
+        break;
+      // case 'nip':
+      //   setNip(event.target.value);
+      //   break;
+      default:
+        break;
+    }
+  }
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setShowAlert(false);
+  };
+
+  const register = () => {
+    if (casher !== "" && initialAmount !== ""){
+      handleAlert("success","El corte de venta se registro correctamente");
+    } else {
+      handleAlert("error", "Debe llenar todos los datos")
     }
   }
 
@@ -51,13 +99,21 @@ const CutOff = () => {
         </div>
         <div class="d-flex justify-content-between pr-2 ml-3">
           <text className="font-weight-bold">Cajero / Operador</text>
-          <text> Roberto Gutierrez</text>
+          {open ?
+            <input type="text" name="casher" value={casher} onChange={handleChange} className={styles.input} />
+            :
+            <text> Roberto Gutierrez</text>
+          }
         </div>
       </div>
       <div class="col">
         <div class="d-flex justify-content-between pr-2 ml-3">
           <text className="font-weight-bold">Cantidad Inicial</text>
-          <text> ${item.initial || '0.00'}</text>
+          {open ?
+            <input type="text" size="sm" name="initialAmount" value={initialAmount} onChange={handleChange} className={styles.input} />
+            :
+            <text> ${item.initial || '0.00'}</text>
+          }
         </div>
         <div class="d-flex justify-content-between pr-2 ml-3">
           <text className="font-weight-bold">Total</text>
@@ -79,6 +135,11 @@ const CutOff = () => {
 
   return (
     <div className="col-12 p-0 d-flex justify-content-center">
+      <Snackbar open={showAlert} autoHideDuration={6000} onClose={handleClose}>
+        <Alert onClose={handleClose} severity={type}>
+          {message}
+        </Alert>
+      </Snackbar>
       <div className="col-8 ">
         <h1>Corte de Caja</h1>
         {buildCutoff(openCutoff, 0, true)}
@@ -101,10 +162,10 @@ const CutOff = () => {
           </tbody>
         </table>
         <div className="text-right">
-          <button type="button" class="btn btn-info">Registrar</button>
+          <button type="button" class="btn btn-info" onClick={() => register()}>Registrar</button>
         </div>
         <h1>Historial</h1>
-        {closedCutoff.map((item,index) => buildCutoff(item,index))}
+        {closedCutoff.map((item, index) => buildCutoff(item, index))}
       </div>
     </div>
   );
