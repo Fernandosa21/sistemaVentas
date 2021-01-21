@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import 'moment/locale/es-mx'
 import { getCutoffs, putCutoff } from '../../services/CutoffService'
-import { getSales } from '../../services/SaleService'
+import { getSales, getSalesByCutoff } from '../../services/SaleService'
 import styles from '../styles.module.css';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
@@ -35,7 +35,6 @@ const CutOff = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [message, setMessage] = useState("");
   const [type, setType] = useState("");
-  const [showSales, setShowSales] = useState(false);
 
   const callApi = async () => {
     try {
@@ -48,7 +47,7 @@ const CutOff = () => {
       setSales(responseSales)
     }
     catch (err) {
-
+      handleAlert("error", "Algo salió mal")
     }
   }
 
@@ -98,10 +97,23 @@ const CutOff = () => {
     }
   }
 
+  const showSales = async (index, value, id_cutoff) => {
+    try {
+      const response = (await getSalesByCutoff(id_cutoff)).sales;
+      const closedTemp = [...closedCutoff];
+      closedTemp[index].sales = response;
+      closedTemp[index].showSales = value;
+      setClosedCutoff(closedTemp)
+    }
+    catch (err) {
+      handleAlert("error", "Algo salió mal")
+    }
+  }
+
   const buildCutoff = (item, index, open) => (
-    <div>
-      <div className="row">
-        <div key={index} class="col">
+    <div key={index}>
+      <div className="row mt-3 border rounded">
+        <div  class="col mt-2 mb-2">
           <div class="d-flex justify-content-between pr-2 ml-3">
             <text className="font-weight-bold">Fecha</text>
             <text> {moment(item.oppened_hour).format('DD/MMMM/YYYY')}</text>
@@ -119,11 +131,11 @@ const CutOff = () => {
             {open ?
               <input type="text" name="casher" value={casher} onChange={handleChange} className={styles.input} />
               :
-              <text> Roberto Gutierrez</text>
+              <text>{item.user_name}</text>
             }
           </div>
         </div>
-        <div class="col">
+        <div class="col mt-2 mb-2">
           <div class="d-flex justify-content-between pr-2 ml-3">
             <text className="font-weight-bold">Cantidad Inicial</text>
             {open ?
@@ -141,7 +153,7 @@ const CutOff = () => {
             <text> ${open ? totalCash.toFixed(2) : (item.total_income).toFixed(2)}</text>
           </div>
         </div>
-        <div class="col">
+        <div class="col mt-2 mb-2">
           <div class="d-flex justify-content-between pr-2 ml-3">
             <text className="font-weight-bold">Cobros Realizados</text>
             <text> {open ? sales.length : (item.transactions_quantity || 0)}</text>
@@ -149,15 +161,15 @@ const CutOff = () => {
         </div>
         {!open ?
           <div>
-            <button type="button" class="btn btn-link" onClick={() => setShowSales(!showSales)}>
+            <button type="button" class="btn btn-link" onClick={() => showSales(index, !item.showSales, item.id_cutoff)}>
               <FiChevronDown />
             </button>
           </div>
           :
           null}
       </div>
-      {showSales && !open ?
-        renderMoves()
+      {item.showSales && !open ?
+        renderMoves(item.sales || [])
         :
         null
       }
@@ -165,7 +177,7 @@ const CutOff = () => {
 
   )
 
-  const renderMoves = () => {
+  const renderMoves = (specificSales) => {
     return (
       <div>
         <table className="table mt-5">
@@ -177,7 +189,7 @@ const CutOff = () => {
             </tr>
           </thead>
           <tbody>
-            {sales.map((sale, index) => (
+            {specificSales.map((sale, index) => (
               <tr key={index}>
                 <th className="text-center" scope="row">{sale.id_order}</th>
                 <td className="text-center">{sale.pay_method}</td>
