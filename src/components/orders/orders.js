@@ -97,7 +97,7 @@ const Orders = () => {
     setOpen(false);
   };
 
-  const pay = () => {
+  const pay = async () => {
     if ((selectedMethod === 'Efectivo' && cash === "") || (selectedMethod === "Tarjeta" && (card === "" || nip === ""))) {
       handleAlert("error", "No debe haber campos vacios");
     }
