@@ -129,16 +129,16 @@ const CutOff = () => {
             {open ?
               <input type="text" size="sm" name="initialAmount" value={initialAmount} onChange={handleChange} className={styles.input} />
               :
-              <text> ${item.initial || '0.00'}</text>
+              <text> ${item.initial_amount || '0.00'}</text>
             }
           </div>
           <div class="d-flex justify-content-between pr-2 ml-3">
             <text className="font-weight-bold">Total</text>
-            <text> ${open ? totalDay.toFixed(2) : (item.total || 0).toFixed(2)}</text>
+            <text> ${open ? totalDay.toFixed(2) : (item.income || 0).toFixed(2)}</text>
           </div>
           <div class="d-flex justify-content-between pr-2 ml-3">
             <text className="font-weight-bold">Total a entregar</text>
-            <text> ${open ? totalCash.toFixed(2) : (item.total_income || 0).toFixed(2)}</text>
+            <text> ${open ? totalCash.toFixed(2) : (item.total_income).toFixed(2)}</text>
           </div>
         </div>
         <div class="col">
@@ -223,12 +223,10 @@ const CutOff = () => {
         </div>
       </div>}
       <div className="col-8 ">
-        <h1>Historial</h1>
-          {closedCutoff.map((item, index) => buildCutoff(item, index))}
-        </div>
         <h3>Historial</h3>
         {closedCutoff.map((item, index) => buildCutoff(item, index))}
       </div>
+    </div>
   );
 }
 
