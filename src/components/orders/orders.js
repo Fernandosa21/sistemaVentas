@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
-import { getSales, putSale } from '../../services/SaleService'
-import { getSaleDetails } from '../../services/SaleDetailsService'
+import { getSales, putSale } from '../../services/SaleService';
+import { getSaleDetails } from '../../services/SaleDetailsService';
+import Snackbar from '@material-ui/core/Snackbar';
+import MuiAlert from '@material-ui/lab/Alert';
 
 const Orders = () => {
   useEffect(() => {
@@ -9,28 +11,51 @@ const Orders = () => {
   },
     []);
 
+  const Alert = (props) => {
+    return <MuiAlert elevation={6} variant="filled" {...props} />;
+  }
+
   const callApi = async () => {
-    const sales = await getSales(true);
-    setOrders(sales.sales)
+    try {
+      const sales = await getSales(true);
+      setOrders(sales.sales)
+    } catch (err) {
+      handleAlert("error", "Hubo un error de conexión")
+    }
+  }
+
+  const handleAlert = (type, message) => {
+    setOpen(true);
+    setMessage(message)
+    setType(type)
   }
 
   const [details, setDetails] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState();
   const [orders, setOrders] = useState([]);
-  const [selectedMethod, setSetelectedMethod] = useState("");
+  const [selectedMethod, setSelectedMethod] = useState("");
   const [cash, setCash] = useState(0);
   const [change, setChange] = useState(0);
   const [card, setCard] = useState("");
   const [nip, setNip] = useState("");
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [type, setType] = useState("");
 
   const selectOrder = async (order) => {
-    const saleDetails = await getSaleDetails(order.id_sale);
-    const currentOrder = {
-      ...order,
-      products: saleDetails.saleDetails
+    try {
+      const saleDetails = await getSaleDetails(order.id_sale);
+      const currentOrder = {
+        ...order,
+        products: saleDetails.saleDetails
+      }
+      setSelectedOrder(currentOrder)
+      setDetails(true);
+    } catch (err) {
+      setOpen(true);
+      setMessage("Hubo un error de conexión")
+      setType("error")
     }
-    setSelectedOrder(currentOrder)
-    setDetails(true);
   }
 
   const calculateTotal = () => {
@@ -39,7 +64,14 @@ const Orders = () => {
   }
 
   const calculateChange = () => {
-    setChange((cash - calculateTotal()).toFixed(2))
+    console.log(calculateTotal());
+    const total = calculateTotal();
+    if (parseFloat(cash) < total) {
+      handleAlert("error", "El monto en efectivo debe ser mayor que el total de la orden");
+    }
+    else {
+      setChange((cash - total).toFixed(2))
+    }
   }
 
   const handleChange = (event) => {
@@ -58,9 +90,37 @@ const Orders = () => {
     }
   }
 
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpen(false);
+  };
+
+  const pay = () => {
+    if ((selectedMethod === 'Efectivo' && cash === "") || (selectedMethod === "Tarjeta" && (card === "" || nip === ""))) {
+      handleAlert("error", "No debe haber campos vacios");
+    }
+    else {
+      try{
+        await putSale(selectedOrder.id_order, selectedMethod, card)
+        handleAlert("success", "El pago se aplico con exito");
+      }
+      catch(err){
+        handleAlert("error", "Hubo un error al registrar el pago");
+      }
+    }
+
+  }
+
   const renderOrders = () => {
     return (
       <div className="col-8 ">
+        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+          <Alert onClose={handleClose} severity={type}>
+            {message}
+          </Alert>
+        </Snackbar>
         <h1>Ordenes</h1>
         <table className="table">
           <thead>
@@ -86,12 +146,26 @@ const Orders = () => {
     )
   }
 
+  const goBack = () => {
+    setDetails(false);
+    setCash("");
+    setChange(0);
+    setCard("");
+    setNip("");
+    setSelectedMethod("");
+  }
+
   const renderOrderDetail = () => {
     return (
       <div className="col-8 ">
+        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+          <Alert onClose={handleClose} severity={type}>
+            {message}
+          </Alert>
+        </Snackbar>
         <h1>Detallas de Ordenes</h1>
         <div className="col-8">
-          <button type="button" class="btn btn-link" onClick={() => setDetails(false)}>
+          <button type="button" class="btn btn-link" onClick={() => goBack()}>
             <FiChevronLeft />
             <text>Atras</text>
           </button>
@@ -124,10 +198,10 @@ const Orders = () => {
         <div className="row d-flex justify-content-end">
           <h5 className="text-right m-5">Metodo de Pago</h5>
           <div className="text-right m-5">
-            <button type="button" class="btn btn-outline-info btn-lg" onClick={() => setSetelectedMethod('Efectivo')}>Efectivo</button>
+            <button type="button" class="btn btn-outline-info btn-lg" onClick={() => setSelectedMethod('Efectivo')}>Efectivo</button>
           </div>
           <div className="text-right m-5">
-            <button type="button" class="btn btn-outline-info btn-lg" onClick={() => setSetelectedMethod('Tarjeta')}>Tarjeta</button>
+            <button type="button" class="btn btn-outline-info btn-lg" onClick={() => setSelectedMethod('Tarjeta')}>Tarjeta</button>
           </div>
         </div>
         {selectedMethod !== "" ?
@@ -154,7 +228,7 @@ const Orders = () => {
                 <button type="button" class="btn btn-outline-info btn-lg" onClick={() => calculateChange()}>Calcular</button>
               </div>
             </div>
-            {change !== 0 ?
+            {change !== 0                    ?
               <div className="row">
                 <div class="d-flex justify-content-between m-3">
                   <text className="font-weight-bold mr-3">Cambio</text>
@@ -180,19 +254,10 @@ const Orders = () => {
           </div>
         }
         <div className="text-right m-3">
-          <button type="button" onClick={payOrder} class="btn btn-info btn-lg">Pagar</button>
+          <button type="button" class="btn btn-info btn-lg" onClick={() => pay()}>Pagar</button>
         </div>
       </div>
     )
-  }
-
-  const payOrder = async () => {
-    try{
-      await putSale(selectedOrder.id_order, selectedMethod, card)
-    }
-    catch(err){
-
-    }
   }
 
   return (
