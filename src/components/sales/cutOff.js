@@ -22,12 +22,13 @@ const CutOff = () => {
   }
 
   moment.locale('es');
+  
   const [openCutoff, setOpenCutoff] = useState({})
   const [closedCutoff, setClosedCutoff] = useState([])
   const [sales, setSales] = useState([])
-  const cash = sales.filter(sale => sale.pay_method === 'Efectivo')
-  const totalCash = cash.reduce((acc, { amount }) => acc + amount, 0)
-  const totalDay = sales.reduce((acc, { amount }) => acc + amount, 0)
+  const cash = sales && sales.filter(sale => sale.pay_method === 'Efectivo')
+  const totalCash = cash && cash.reduce((acc, { amount }) => acc + amount, 0)
+  const totalDay = sales &&  sales.reduce((acc, { amount }) => acc + amount, 0)
   const [casher, setCasher] = useState("");
   const [initialAmount, setInitialAmount] = useState("");
   const [showAlert, setShowAlert] = useState(false);
@@ -40,8 +41,6 @@ const CutOff = () => {
       const open = response.filter(item => item.status === 'opened')[0];
       const closed = response.filter(item => item.status === 'closed');
       const responseSales = (await getSales()).sales;
-
-      console.log(responseSales)
       setOpenCutoff(open)
       setClosedCutoff(closed)
       setSales(responseSales)
@@ -74,9 +73,24 @@ const CutOff = () => {
     setShowAlert(false);
   };
 
-  const register = () => {
+  const register = async () => {
     if (casher !== "" && initialAmount !== ""){
-      handleAlert("success","El corte de venta se registro correctamente");
+      try {
+        const response = await putCutoff(
+          openCutoff.id_cutoff,
+          casher,
+          parseFloat(initialAmount).toFixed(2),
+          totalDay.toFixed(2),
+          totalCash.toFixed(2),
+          sales.length)
+        if(!response.success)
+          throw('Algo salio mal');
+        callApi()
+        handleAlert("success","El corte de venta se registro correctamente");
+      } catch (err) {
+        console.log(err)
+        handleAlert("error", "Algo salió mal")
+      }
     } else {
       handleAlert("error", "Debe llenar todos los datos")
     }
@@ -134,13 +148,13 @@ const CutOff = () => {
   )
 
   return (
-    <div className="col-12 p-0 d-flex justify-content-center">
+    <div className="col-12 p-0 d-flex justify-content-center row">
       <Snackbar open={showAlert} autoHideDuration={6000} onClose={handleClose}>
         <Alert onClose={handleClose} severity={type}>
           {message}
         </Alert>
       </Snackbar>
-      <div className="col-8 ">
+      {openCutoff && <div className="col-8 ">
         <h1>Corte de Caja</h1>
         {buildCutoff(openCutoff, 0, true)}
         <table className="table mt-5">
@@ -164,9 +178,11 @@ const CutOff = () => {
         <div className="text-right">
           <button type="button" class="btn btn-info" onClick={() => register()}>Registrar</button>
         </div>
+      </div>}
+      <div className="col-8 ">
         <h1>Historial</h1>
-        {closedCutoff.map((item, index) => buildCutoff(item, index))}
-      </div>
+          {closedCutoff.map((item, index) => buildCutoff(item, index))}
+        </div>
     </div>
   );
 }

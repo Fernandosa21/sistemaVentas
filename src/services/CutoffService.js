@@ -7,16 +7,16 @@ export const getCutoffs = async (id_sale) => {
 }
 
 export const putCutoff = async (id_cutoff, user_name, initial_amount, income, total_income, transactions_quantity) => {
-  const response = await fetch(`${API}/${id_cutoff}`, {
+  const response = await fetch(`${API}/updateStatus/${id_cutoff}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      id_cutoff, user_name,
+      user_name,
       initial_amount,
       income,
       total_income,
       transactions_quantity,
-      status: 'close'
+      status: 'closed'
     })
   });
   return response.json();
