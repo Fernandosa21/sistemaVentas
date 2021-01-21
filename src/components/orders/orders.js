@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
-import { getSales } from '../../services/SaleService';
+import { getSales, putSale } from '../../services/SaleService';
 import { getSaleDetails } from '../../services/SaleDetailsService';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
@@ -97,12 +97,18 @@ const Orders = () => {
     setOpen(false);
   };
 
-  const pay = () => {
+  const pay = async () => {
     if ((selectedMethod === 'Efectivo' && cash === "") || (selectedMethod === "Tarjeta" && (card === "" || nip === ""))) {
       handleAlert("error", "No debe haber campos vacios");
     }
     else {
-      handleAlert("success", "El pago se aplico con exito");
+      try{
+        await putSale(selectedOrder.id_order, selectedMethod, card)
+        handleAlert("success", "El pago se aplico con exito");
+      }
+      catch(err){
+        handleAlert("error", "Hubo un error al registrar el pago");
+      }
     }
 
   }
