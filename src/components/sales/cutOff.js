@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import 'moment/locale/es-mx'
-import { getCutoffs } from '../../services/CutoffService'
+import { getCutoffs, putCutoff } from '../../services/CutoffService'
 import { getSales } from '../../services/SaleService'
 
 const CutOff = () => {
