@@ -103,7 +103,10 @@ const Orders = () => {
     }
     else {
       try{
-        await putSale(selectedOrder.id_order, selectedMethod, card)
+        const response = await putSale(selectedOrder.id_order, selectedMethod, card, nip);
+        if(!response.success)
+          throw('Algo salio mal');
+        goBack();
         handleAlert("success", "El pago se aplico con exito");
       }
       catch(err){
@@ -147,12 +150,14 @@ const Orders = () => {
   }
 
   const goBack = () => {
+    callApi()
     setDetails(false);
     setCash("");
     setChange(0);
     setCard("");
     setNip("");
     setSelectedMethod("");
+    setSelectedOrder({})
   }
 
   const renderOrderDetail = () => {

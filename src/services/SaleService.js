@@ -6,13 +6,14 @@ export const getSales = async (pending) => {
   return sales;
 }
 
-export const putSale = async (id_order, pay_method, card, amount) => {
+export const putSale = async (id_order, pay_method, card, pin) => {
   const response = await fetch(`${API}/updateStatus/${id_order}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       pay_method,
       card,
+      pin,
     })
   });
   return response.json();
