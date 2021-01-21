@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FiChevronRight, FiChevronLeft } from "react-icons/fi";
-import { getSales } from '../../services/SaleService'
+import { getSales, putSale } from '../../services/SaleService'
 import { getSaleDetails } from '../../services/SaleDetailsService'
 
 const Orders = () => {
@@ -180,10 +180,19 @@ const Orders = () => {
           </div>
         }
         <div className="text-right m-3">
-          <button type="button" class="btn btn-info btn-lg">Pagar</button>
+          <button type="button" onClick={payOrder} class="btn btn-info btn-lg">Pagar</button>
         </div>
       </div>
     )
+  }
+
+  const payOrder = async () => {
+    try{
+      await putSale(selectedOrder.id_order, selectedMethod, card)
+    }
+    catch(err){
+
+    }
   }
 
   return (
