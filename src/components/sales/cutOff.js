@@ -54,16 +54,19 @@ const CutOff = () => {
   }
 
   const handleChange = (event) => {
+    const isValid = event.target.validity.valid;
     switch (event.target.name) {
       case 'casher':
         setCasher(event.target.value);
         break;
       case 'initialAmount':
+        if(isValid) {
         setInitialAmount(event.target.value);
+        }
+        else {
+          handleAlert("error", "Introducir solo números.");
+        }
         break;
-      // case 'nip':
-      //   setNip(event.target.value);
-      //   break;
       default:
         break;
     }
@@ -113,7 +116,14 @@ const CutOff = () => {
           <div class="d-flex justify-content-between pr-2 ml-3">
             <text className="font-weight-bold">Cantidad Inicial</text>
             {open ?
-              <input type="text" size="sm" name="initialAmount" value={initialAmount} onChange={handleChange} className={styles.input} />
+              <input
+                type="text"
+                size="sm"
+                name="initialAmount"
+                value={initialAmount}
+                onChange={handleChange}
+                className={styles.input}
+                pattern="^(\d|-)?(\d|,)*\.?\d*$" />
               :
               <text> ${item.initial || '0.00'}</text>
             }
