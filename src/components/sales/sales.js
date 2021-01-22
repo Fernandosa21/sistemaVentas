@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { getSales } from '../../services/SaleService'
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+import Spinner from 'react-bootstrap/Spinner'
 
 const Sales = () => {
   useEffect(() => {
@@ -21,7 +22,7 @@ const Sales = () => {
     setType(type)
   }
 
-
+  const [loading, setLoading] = useState(true);
   const [sales, setSales] = useState([])
   const totalDay = sales && sales.filter(({ pay_method }) => pay_method === 'Efectivo').reduce((acc, { amount }) => acc + amount, 0)
   const [open, setOpen] = useState(false);
@@ -29,11 +30,14 @@ const Sales = () => {
   const [type, setType] = useState("");
 
   const callApi = async () => {
+    setLoading(true)
     try {
       const responseSales = (await getSales()).sales;
       setSales(responseSales)
+      setLoading(false)
     }
     catch (err) {
+      setLoading(false)
       handleAlert("error", "Hubo un error al cargar las ventas");
     }
   }
@@ -52,7 +56,8 @@ const Sales = () => {
           {message}
         </Alert>
       </Snackbar>
-      <div className="col-8 ">
+      {loading ? <Spinner animation='grow' />
+      : <div className="col-8 ">
         <h1>Ventas de hoy</h1>
         <table className="table">
           <thead>
@@ -77,7 +82,7 @@ const Sales = () => {
             </tr>
           </tbody>
         </table>
-      </div>
+      </div>}
     </div>
   );
 }

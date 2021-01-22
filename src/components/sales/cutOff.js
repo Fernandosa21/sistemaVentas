@@ -7,6 +7,7 @@ import styles from '../styles.module.css';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
 import { FiChevronDown } from "react-icons/fi";
+import Spinner from 'react-bootstrap/Spinner'
 
 const CutOff = () => {
   useEffect(() => {
@@ -23,7 +24,7 @@ const CutOff = () => {
   }
 
   moment.locale('es');
-  
+  const [loading, setLoading] = useState(true);
   const [openCutoff, setOpenCutoff] = useState({})
   const [closedCutoff, setClosedCutoff] = useState([])
   const [sales, setSales] = useState([])
@@ -37,16 +38,19 @@ const CutOff = () => {
   const [type, setType] = useState("");
 
   const callApi = async () => {
-    try {
+    try {    
+      setLoading(true)
       const response = (await getCutoffs()).cutOffs;
       const open = response.filter(item => item.status === 'opened')[0];
       const closed = response.filter(item => item.status === 'closed');
       const responseSales = (await getSales()).sales;
       setOpenCutoff(open)
       setClosedCutoff(closed)
-      setSales(responseSales)
+      setSales(responseSales)      
+      setLoading(false)
     }
     catch (err) {
+      setLoading(false)
       handleAlert("error", "Algo salió mal")
     }
   }
@@ -59,9 +63,6 @@ const CutOff = () => {
       case 'initialAmount':
         setInitialAmount(event.target.value);
         break;
-      // case 'nip':
-      //   setNip(event.target.value);
-      //   break;
       default:
         break;
     }
@@ -209,6 +210,8 @@ const CutOff = () => {
           {message}
         </Alert>
       </Snackbar>
+      {loading ? <Spinner animation='grow' />
+      : <div className='col-12 p-0 d-flex justify-content-center row'>
       {openCutoff && <div className="col-8 ">
         <h1>Corte de Caja</h1>
         {buildCutoff(openCutoff, 0, true)}
@@ -245,6 +248,7 @@ const CutOff = () => {
 
         }).map((item, index) => buildCutoff(item, index))}
       </div>
+    </div>}
     </div>
   );
 }

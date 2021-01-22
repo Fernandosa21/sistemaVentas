@@ -4,6 +4,7 @@ import { getSales, putSale } from '../../services/SaleService';
 import { getSaleDetails } from '../../services/SaleDetailsService';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+import Spinner from 'react-bootstrap/Spinner'
 
 const Orders = () => {
   useEffect(() => {
@@ -17,9 +18,12 @@ const Orders = () => {
 
   const callApi = async () => {
     try {
+      setLoading(true)
       const sales = await getSales(true);
       setOrders(sales.sales)
+      setLoading(false)
     } catch (err) {
+      setLoading(false)
       handleAlert("error", "Hubo un error de conexión")
     }
   }
@@ -30,6 +34,7 @@ const Orders = () => {
     setType(type)
   }
 
+  const [loading, setLoading] = useState(true);
   const [details, setDetails] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState();
   const [orders, setOrders] = useState([]);
@@ -44,6 +49,7 @@ const Orders = () => {
 
   const selectOrder = async (order) => {
     try {
+      setLoading(true)
       const saleDetails = await getSaleDetails(order.id_sale);
       const currentOrder = {
         ...order,
@@ -51,7 +57,9 @@ const Orders = () => {
       }
       setSelectedOrder(currentOrder)
       setDetails(true);
+      setLoading(false)
     } catch (err) {
+      setLoading(false)
       setOpen(true);
       setMessage("Hubo un error de conexión")
       setType("error")
@@ -102,14 +110,17 @@ const Orders = () => {
       handleAlert("error", "No debe haber campos vacios");
     }
     else {
-      try{
+      try {
+        setLoading(true)
         const response = await putSale(selectedOrder.id_order, selectedMethod, card, nip);
-        if(!response.success)
-          throw('Algo salio mal');
+        if (!response.success)
+          throw ('Algo salio mal');
         goBack();
+        setLoading(false)
         handleAlert("success", "El pago se aplico con exito");
       }
-      catch(err){
+      catch (err) {
+        setLoading(false)
         handleAlert("error", "Hubo un error al registrar el pago");
       }
     }
@@ -124,27 +135,31 @@ const Orders = () => {
             {message}
           </Alert>
         </Snackbar>
-        <h1>Ordenes</h1>
-        <table className="table">
-          <thead>
-            <tr>
-              <th className="text-center" scope="col">#</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order, index) => (
-              <tr key={index}>
-                <th className="text-center" scope="row">{order.id_order}</th>
-                <td className="text-right">
-                  <button type="button" class="btn btn-link" onClick={() => selectOrder(order)}>
-                    <FiChevronRight />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        {loading ? <Spinner animation='grow' />
+          : <div className="col-12 p-0">
+            <h1>Ordenes</h1>
+            <table className="table">
+              <thead>
+                <tr>
+                  <th className="text-center" scope="col">#</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.map((order, index) => (
+                  <tr key={index}>
+                    <th className="text-center" scope="row">{order.id_order}</th>
+                    <td className="text-right">
+                      <button type="button" class="btn btn-link" onClick={() => selectOrder(order)}>
+                        <FiChevronRight />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        }
       </div>
     )
   }
@@ -233,7 +248,7 @@ const Orders = () => {
                 <button type="button" class="btn btn-outline-info btn-lg" onClick={() => calculateChange()}>Calcular</button>
               </div>
             </div>
-            {change !== 0                    ?
+            {change !== 0 ?
               <div className="row">
                 <div class="d-flex justify-content-between m-3">
                   <text className="font-weight-bold mr-3">Cambio</text>
