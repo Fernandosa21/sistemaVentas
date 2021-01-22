@@ -236,7 +236,14 @@ const CutOff = () => {
       </div>}
       <div className="col-8 ">
         <h3>Historial</h3>
-        {closedCutoff.map((item, index) => buildCutoff(item, index))}
+        {closedCutoff.sort((a,b)=>{
+          if(a.closed_hour > b.closed_hour)
+            return -1;
+          else if(a.closed_hour < b.closed_hour)
+            return 1;
+          return 0;
+
+        }).map((item, index) => buildCutoff(item, index))}
       </div>
     </div>
   );
