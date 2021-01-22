@@ -23,7 +23,7 @@ const Sales = () => {
 
 
   const [sales, setSales] = useState([])
-  const totalDay = sales.filter(({ pay_method }) => pay_method === 'Efectivo').reduce((acc, { amount }) => acc + amount, 0)
+  const totalDay = sales && sales.filter(({ pay_method }) => pay_method === 'Efectivo').reduce((acc, { amount }) => acc + amount, 0)
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [type, setType] = useState("");
@@ -63,7 +63,7 @@ const Sales = () => {
             </tr>
           </thead>
           <tbody>
-            {sales.map((sale, index) => (
+            {sales && sales.map((sale, index) => (
               <tr key={index}>
                 <th className="text-center" scope="row">{sale.id_order}</th>
                 <td className="text-center">{sale.pay_method}</td>
