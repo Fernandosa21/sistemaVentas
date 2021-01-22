@@ -30,7 +30,7 @@ const CutOff = () => {
   const [sales, setSales] = useState([])
   const cash = sales && sales.filter(sale => sale.pay_method === 'Efectivo')
   const totalCash = cash && cash.reduce((acc, { amount }) => acc + amount, 0)
-  const totalDay = sales &&  sales.reduce((acc, { amount }) => acc + amount, 0)
+  const totalDay = sales && sales.reduce((acc, { amount }) => acc + amount, 0)
   const [casher, setCasher] = useState("");
   const [initialAmount, setInitialAmount] = useState("");
   const [showAlert, setShowAlert] = useState(false);
@@ -56,12 +56,18 @@ const CutOff = () => {
   }
 
   const handleChange = (event) => {
+    const isValid = event.target.validity.valid;
     switch (event.target.name) {
       case 'casher':
         setCasher(event.target.value);
         break;
       case 'initialAmount':
-        setInitialAmount(event.target.value);
+        if (isValid) {
+          setInitialAmount(event.target.value);
+        }
+        else {
+          handleAlert("error", "Introducir solo números.");
+        }
         break;
       default:
         break;
@@ -76,7 +82,7 @@ const CutOff = () => {
   };
 
   const register = async () => {
-    if (casher !== "" && initialAmount !== ""){
+    if (casher !== "" && initialAmount !== "") {
       try {
         const response = await putCutoff(
           openCutoff.id_cutoff,
@@ -85,10 +91,10 @@ const CutOff = () => {
           totalDay.toFixed(2),
           totalCash.toFixed(2),
           sales.length)
-        if(!response.success)
-          throw('Algo salio mal');
+        if (!response.success)
+          throw ('Algo salio mal');
         callApi()
-        handleAlert("success","El corte de venta se registro correctamente");
+        handleAlert("success", "El corte de venta se registro correctamente");
       } catch (err) {
         console.log(err)
         handleAlert("error", "Algo salió mal")
@@ -114,7 +120,7 @@ const CutOff = () => {
   const buildCutoff = (item, index, open) => (
     <div key={index}>
       <div className="row mt-3 border rounded">
-        <div  class="col mt-2 mb-2">
+        <div class="col mt-2 mb-2">
           <div class="d-flex justify-content-between pr-2 ml-3">
             <text className="font-weight-bold">Fecha</text>
             <text> {moment(item.oppened_hour).format('DD/MMMM/YYYY')}</text>
@@ -140,9 +146,16 @@ const CutOff = () => {
           <div class="d-flex justify-content-between pr-2 ml-3">
             <text className="font-weight-bold">Cantidad Inicial</text>
             {open ?
-              <input type="text" size="sm" name="initialAmount" value={initialAmount} onChange={handleChange} className={styles.input} />
+              <input
+                type="text"
+                size="sm"
+                name="initialAmount"
+                value={initialAmount}
+                onChange={handleChange}
+                className={styles.input}
+                pattern="^(\d|-)?(\d|,)*\.?\d*$" />
               :
-              <text> ${item.initial_amount || '0.00'}</text>
+              <text> ${item.initial_amount.toFixed(2) || '0.00'}</text>
             }
           </div>
           <div class="d-flex justify-content-between pr-2 ml-3">
@@ -239,10 +252,10 @@ const CutOff = () => {
       </div>}
       <div className="col-8 ">
         <h3>Historial</h3>
-        {closedCutoff.sort((a,b)=>{
-          if(a.closed_hour > b.closed_hour)
+        {closedCutoff.sort((a, b) => {
+          if (a.closed_hour > b.closed_hour)
             return -1;
-          else if(a.closed_hour < b.closed_hour)
+          else if (a.closed_hour < b.closed_hour)
             return 1;
           return 0;
 

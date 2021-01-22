@@ -83,9 +83,16 @@ const Orders = () => {
   }
 
   const handleChange = (event) => {
+    const isValid = event.target.validity.valid;
+
+
     switch (event.target.name) {
       case 'cash':
-        setCash(event.target.value);
+        if (isValid) {
+          setCash(event.target.value);
+        } else {
+          handleAlert("error", "Introducir solo números.");
+        }
         break;
       case 'card':
         setCard(event.target.value);
@@ -242,7 +249,13 @@ const Orders = () => {
             <div className="row d-flex justify-content-between mt-4 mb-4">
               <div class="d-flex justify-content-between ml-3">
                 <text className="font-weight-bold mr-3">Monto</text>
-                <input type="text" name="cash" value={cash} onChange={handleChange} class="form-control" />
+                <input
+                  type="text"
+                  name="cash"
+                  value={cash}
+                  onChange={handleChange}
+                  class="form-control"
+                  pattern="^(\d|-)?(\d|,)*\.?\d*$" />
               </div>
               <div className="text-right">
                 <button type="button" class="btn btn-outline-info btn-lg" onClick={() => calculateChange()}>Calcular</button>
